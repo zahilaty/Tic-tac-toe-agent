@@ -37,7 +37,7 @@ class HumanPlayer(Player):
         self.typ = 0
             
     def GetAction(self,board):
-        action = int(input("choose square:"))
+        action = int(input("choose square (0-9):"))
         return action
 
 
@@ -55,7 +55,7 @@ class MiniMaxPlayer(Player):
     def __init__(self,symbol):
         self.symbol = symbol
         self.typ = 2
-        print('Created an unbeatable MinMax player for ' + self.SymbolStr() )
+        print('Created an un-beatable MinMax player for ' + self.SymbolStr() )
             
     def GetAction(self,board):
         action = self.FindBestCase(board,self.symbol)
@@ -81,7 +81,7 @@ class MiniMaxPlayer(Player):
 def minimax(board,last_move,depth,isMax):
     last_act,last_val = last_move[0],last_move[1]
     if board.IsWon(last_act,last_val):
-        if isMax: #this step is inveresed because regarding the last step
+        if isMax:
             return -10 + depth 
         else:
             return 10 - depth

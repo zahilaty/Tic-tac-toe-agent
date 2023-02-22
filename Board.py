@@ -5,10 +5,8 @@ Some hard coded things:
     -1 is 'o'
     0 is blank space at the board
 
-# TODO: render board and gui stuff, or make printing more generic
+# TODO: render board and other gui stuff
     
-Created on Mon Feb 13 10:44:33 2023
-
 @author: zahil
 """
 import numpy as np

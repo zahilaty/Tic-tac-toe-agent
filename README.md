@@ -15,7 +15,7 @@ To play against the RL agent or the minimax algorithm, run Main.py (see document
 
 # Useful links:
 https://www.youtube.com/watch?v=trKjYdBASyQ  
-https://towardsdatascience.com/reinforcement-learning-implement-tictactoe-189582bea542
+https://towardsdatascience.com/how-to-play-tic-tac-toe-using-reinforcement-learning-9604130e56f6
 
 # License
 This project is licensed under the MIT License. See the LICENSE file for more information.

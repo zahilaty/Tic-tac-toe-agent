@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 13 15:41:31 2023
-A simple wrpper to all classes so human can play against computer
+A simple wrpper to all classes so human can play against the computer
 Some hard coded things:
     +1 is 'x'
     -1 is 'o'
     0 is blank space at the board
 Please note that both MinMax player and board support any size, but:
     A. The priniting is not nice for size != 3
-    B. The MinMax player will run for hours..
-Note that RL is very specific: only for 3X3 and only for 'x' or 'o' (TODO: maybe
-                                                                     we can inverse?)
+    B. The MinMax player will run for hours.. (TODO: Cpython?)
+
 @author: zahil
 """
 from Board import Board
@@ -39,6 +37,3 @@ if __name__ == "__main__":
         board.PrintBoard()
         if board.terminated:
             break
-    
-#X: 4 8 2 6\5
-#O: 8 2 6 7

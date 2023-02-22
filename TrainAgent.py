@@ -3,7 +3,7 @@
 Created on Mon Feb 13 12:33:42 2023
 Train two agents
 If you want one of them to be stupid or just to add more states to Q
-then set p1_exp_prob to 0, of play with the p1_decay_factor
+then set p1_exp_prob to 0, or play with the p1_decay_factor
 @author: zahil
 """
 
@@ -11,10 +11,8 @@ from Board import Board
 from Agent import Agent
 from tqdm import tqdm
 
-p1 = Agent(1)
-#p1.loadTrainer('Xplayer.pkl')
-p2 = Agent(-1)
-#p2.loadTrainer('Oplayer.pkl')
+p1 = Agent(1) # 1 = x
+p2 = Agent(-1) # -1 = o
 p1.loadTrainer('SharedDict.pkl')
 
 NumOfIter = 100000
@@ -45,6 +43,4 @@ for k in tqdm(range(NumOfIter)):
     #print('Results of game number ' + str(k) + ':')
     #board.PrintBoard()
     
-# p1.saveTrainer('Xplayer.pkl')
-# p2.saveTrainer('Oplayer.pkl')
-p1.saveTrainer('SharedDict.pkl')
+p1.saveTrainer('SharedDict.pkl') #this saves both x and o weights (the dictionary is shared with static class var)
