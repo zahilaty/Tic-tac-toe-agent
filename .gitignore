@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+#C++
+*.o
+*.exe
+
+#Dev C++
+*.win
+*.gch
+*.dev
+*.layout
