@@ -1,47 +1,58 @@
 #ifndef BOARD_H
 #define BOARD_H
 #include <iostream>
+#include <vector>
 #include <cstdlib> // for rand() and srand()
 #include <string> //convert char array to string
 #include <assert.h>   // for assert in one line..
 #include <numeric> //for sum of array in one line..
 #include <time.h> //for srand seed
 using namespace std;
-#define size 3 // I used define istead of this: https://stackoverflow.com/questions/751878/determine-array-size-in-constructor-initializer
-#define sizeSq 9
+const int size = 3; // I used define istead of this: https://stackoverflow.com/questions/751878/determine-array-size-in-constructor-initializer
+const int sizeSq = size*size;
 
 class Board {
 public:
+		
     // Constructor
     Board() {
     	reset_board();
 	}
 	
-	// Copy from another board - use the Using copy constructor!
-	// https://www.techiedelight.com/how-to-clone-objects-in-cpp/
-	/* 
-	static void CloneBoard(board old_br, board new_br) {
-		copy(new_br.GetBoardArray(), new_br.GetBoardArray() + size, old_br.GetBoardArray())		
+	// Copy Constructor - instead of "static void CloneBoard(board old_br, board new_br)"
+	Board(const Board &old_board) {
+		
+		//copy(board, board + sizeSq, old_board.board);
+		int m;
+		int n;
+		for (int lin_ind=0;lin_ind<sizeSq;lin_ind++){
+			m = M(lin_ind);
+			n = N(lin_ind);
+			board[lin_ind] = old_board.board[lin_ind];
+			boardAs2D[m][n] = old_board.boardAs2D[m][n];
+		}
+		terminated = old_board.terminated;
+		draw = old_board.draw;
 	}
-	*/
-  	int m(int lin_ind) {
+	
+	// From linear index of 1D board to 2D  	
+	int M(int lin_ind) {
   		int m = (int) lin_ind/size;
   		return m;
 	}
-	int n(int lin_ind) {
+	int N(int lin_ind) {
 		int n = lin_ind%size;
 		return n;
 	}
+	
     // Reset the board to its initial state
     void reset_board() {    	
     	for (int ind = 0; ind<sizeSq; ind++) {    		
     		board[ind] = 0;
-    		boardAs2D[m(ind)][n(ind)] = 0;
-    		ValidActions[ind] = 1; 	// 0 is not valid
+    		boardAs2D[M(ind)][N(ind)] = 0;
 			terminated = false; // when true, game is ended
 			draw = false;
 		}
-		//cout<<"Done Reset Board\n";
 	}
 	
     // Randomly initialize the board
@@ -53,9 +64,8 @@ public:
 		for (int ind = 0; ind<sizeSq; ind++) {	
     		int random = rand() % 3 - 1; // the 3 here is not related to "size" but to player1,player2,blank
     		board[ind] = random;
-			boardAs2D[m(ind)][n(ind)] = random;	
+			boardAs2D[M(ind)][N(ind)] = random;	
 		}
-		//cout<<board[0]<<" "<<board[1]<<" "<<board[2]<<" "<<endl;
 	}
 	
     // Print the board
@@ -88,17 +98,23 @@ public:
 	}
 
     // Get the valid actions for the current state of the board
-    int* GetValidActions() {
-		return ValidActions;
+    vector<int> GetValidActions() {
+    	vector<int> valid_actions; //list of indexes
+    	for (int i = 0; i < sizeSq; i++) {
+            if (board[i] == 0) {
+                valid_actions.push_back(i); //pushing the index, not the value!
+            }
+        }
+		return valid_actions;
 	}
+
 
     // Push an action onto the board's stack
     void push(int lin_ind, int val) {
     	assert ((val == 1) || (val == -1));
     	assert (board[lin_ind]==0);
     	board[lin_ind] = val;
-    	boardAs2D[m(lin_ind)][n(lin_ind)] = val;
-	    ValidActions[lin_ind] = 0; // this square is not valid now
+    	boardAs2D[M(lin_ind)][N(lin_ind)] = val;
 	}
 	
     // Step (push value + check if win)
@@ -107,8 +123,8 @@ public:
     	bool win_flag = IsWon(lin_ind,val);
     	
     	// Calculate the sum using std::accumulate, if it is equal to 0, board is full 
-    	int sum = accumulate(begin(ValidActions), end(ValidActions), 0);
-    	bool board_full = (sum == 0);
+    	vector<int> valid_actions = GetValidActions();
+    	bool board_full = (valid_actions.size() == 0);
 		if (win_flag || board_full) {
 			terminated = true;
 		}
@@ -124,15 +140,16 @@ public:
 
 	// IsWon -the key is to check only the relevant index!
 	bool IsWon(int lin_ind,int val) {
-		int m = (int) lin_ind/size;
-		int n = lin_ind%size;
-    	
+		int m = M(lin_ind);
+		int n = N(lin_ind);    	
+		int SumTOWin = val*size; //either +3 or -3
+		
 		// Sum of elements in row m (go over col)
     	int row_sum = 0;
 		for (int col=0;col<size;col++) {
 			row_sum += boardAs2D[m][col];
 		}
-		if (row_sum==size) {
+		if (row_sum==SumTOWin) {
 			return true;
 		}
 		
@@ -141,27 +158,30 @@ public:
 		for (int row=0;row<size;row++) {
 			col_sum += boardAs2D[row][n];
 		}
-		if (col_sum==size) {
+		if (col_sum==SumTOWin) {
 			return true;
 		}
 		
-		// The only case we need to check diagonal and reverse-diagonal
+		// The only case we need to check diagonal
 		if (m==n) {
 			// Sum of elements in diag
 			int diag_sum = 0;
 			for (int k=0;k<size;k++) {
 				diag_sum += boardAs2D[k][k];
 			}
-			if (diag_sum==size) {
+			if (diag_sum==SumTOWin) {
 				return true;
 			}
-			
+		}
+		
+		// The only case we need to check the reverse-diagonal . Example: m=0,n=2,m+n = 2, size = 3
+		if (m+n == (size-1)) {
 			// sum of elements in reverse diagonal
 			int rev_diag_sum = 0;
 			for (int k=0;k<size;k++) {
 				rev_diag_sum += boardAs2D[k][size-1-k];
 			}
-			if (rev_diag_sum==size) {
+			if (rev_diag_sum==SumTOWin) {
 				return true;
 			}
 		}
@@ -190,13 +210,14 @@ public:
 		string StateCode(CodeAsChars,sizeSq); 
 		return StateCode;
 	}
-		
+	
+	bool terminated = false; // when true, game is ended
+	bool draw = false;
+	
 private:
 	int board[size*size];
 	int boardAs2D[size][size]; 
-	int ValidActions[sizeSq]; // 0 is not valid
-	bool terminated = false; // when true, game is ended
-	bool draw = false;
+
 };
 
 #endif
