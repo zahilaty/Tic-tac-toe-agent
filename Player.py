@@ -37,7 +37,7 @@ class HumanPlayer(Player):
         self.typ = 0
             
     def GetAction(self,board):
-        action = int(input("choose square (0-9):"))
+        action = int(input("choose square (0-8):"))
         return action
 
 
@@ -71,7 +71,6 @@ class MiniMaxPlayer(Player):
             new_board = Board(Board = board_copy.Board)
             new_board.step(act,val)
             score = minimax(new_board,[act,val],depth=0,isMax=False)
-            #print(score)
             if score > max_score:
                 max_score = score
                 action = act
