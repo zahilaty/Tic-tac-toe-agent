@@ -5,17 +5,20 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <utility> // for std::pair
+#include <tuple> // for tie 
+
 #include "Board.h"
 
-/* TODO
-1) return from board a vector
-2) does the define size not creating problems with vector size?
+/* Player is virtual Class 
+which will be override by HumanPlayer, RandomComputer,Minimax Player and RL Agent.
+symbol is int with a value of +1 for x, -1 for o.
+typ is 0 for human , 1 for random player, 2 for minmax player and 3 for agent
 */
-
 class Player {
     public:
-    	int symbol;
-        int typ;
+    	int symbol; 
+        int typ; //
         //Player() {}
         Player(int sym, int t) {
             symbol = sym;
@@ -66,53 +69,71 @@ class MiniMaxPlayer : public Player {
     public:
         MiniMaxPlayer(int sym) : Player(sym,2){
         }
-        int FindBestCase(Board board, int val) {
-            vector<int> valid_actions = board.GetValidActions();
-            if(valid_actions.size() == 1) return valid_actions[0];
-            int max_score = -1000;
-            int action = valid_actions[0];
-            for(int i=0; i<valid_actions.size(); i++) {
-                Board new_board(board);
-                //cout<<"*************\n";
-                //new_board.PrintBoard();
-                new_board.step(valid_actions[i], val);
-                //new_board.PrintBoard();
-                //cout<<"*************\n";
-                int score = minimax(new_board, {valid_actions[i], val}, 0, false);
-                cout<<score<<endl;
-				if(score > max_score) {
-                    max_score = score;
-                    action = valid_actions[i];
-                }
-            }
-            return action;
-        }
         
         int GetAction(Board board) {
-            int action = FindBestCase(board, symbol);
+        	vector<int> last_move = {-1,-1*symbol}; // The last move was the opponent move (therefore the *-1) and the last move was irrelevant
+			int action,score;
+			tie(action,score) = minimax(board, last_move, 0, true);
             return action;
         }
         
     private:
-        int minimax(Board board, vector<int> last_move, int depth, bool isMax) {
-        //int minimax(Board board, int last_move[2], int depth, bool isMax) {
-            int last_act = last_move[0], last_val = last_move[1];
-            if(board.IsWon(last_act, last_val)) {
-                if(isMax) return -10 + depth;
-                else return 10 - depth;
-            }
-            //else {
-            int val = last_val * -1; // flip players
-            
+    	int MaxDepth = 10; //Set a limit to the tree depth
+    	
+        pair<int, int> minimax(Board board, vector<int> last_move, int depth, bool isMax) {
+			
+			/* 
+			This is a recursive function that performs a DFS.
+			 First, let's make sure that we have not reached one of the stopping criteria:
+			1) Someone has won (return the win/lose reward).
+			2) There is draw (return zero reward).
+			3) We have reached a depth  limit (return some default reward).
+			*/
+			
+			// If the depth is 0 than the "last act" is not relevant and therefore passed as -1 to this function (from GetAction)
+			int last_act = last_move[0], last_val = last_move[1];
+			
+			// Check if someone has won. This is relevant only if we are at depth > 0 (otherwise we dont have a "last_act")
+			if (depth>0) {
+				
+            	if(board.IsWon(last_act, last_val)) {
+            		// action is -1: irrelevant at the end of the game
+                	if(isMax) return make_pair(-1, -MaxDepth + depth);
+                	else return make_pair(-1, MaxDepth - depth);
+            	}
+			}
+				          
+            // Get valid moves (actions in the RL terminology)
             vector<int> valid_moves = board.GetValidActions();
-            if(valid_moves.size() == 0) return 0; // a draw
-            int action = valid_moves[0];
-            int max_score = -1000;
-            int min_score = 1000;
+            
+            // If no valid actions left, and we already checked that there was no win, that this is a draw! We return action -1 and score 0
+			if(valid_moves.size() == 0) return make_pair(-1, 0);
+
+			// If we reached the max depth - do not make another call (so the user will not wait too long)
+			if (depth>MaxDepth){
+				return make_pair( valid_moves[0], 0); //return some default action with zero reward 
+			}   
+			         
+			         
+			/* Second, let's continue with the DFS (make another step in the recursion)
+			For this, we will define:
+			1) action - the *current* best action. We need to return this so that GetAction will not have to use another auxillary function.
+			2) next__best_action - the best action of the next step.
+			3) score - the score we will get after doing a step with "action. 
+			Please note that score == reward in RL terminology, and that move == action in RL terminology.
+			4) A new board to test each of the possible actions we can make
+            */ 
+                        
+            int val = last_val * -1; // Flip players
+            int action = valid_moves[0]; 
+            int max_score = -INT_MAX;
+            int min_score = INT_MAX;
+            
             for(int i=0; i<valid_moves.size(); i++) {
                 Board new_board(board);
                 new_board.step(valid_moves[i], val);
-                int score = minimax(new_board, {valid_moves[i], val}, depth+1, !isMax);
+                int next__best_action,score; // we dont need the next best action, but only the current best, which is called here "action"
+                tie(next__best_action,score) = minimax(new_board, {valid_moves[i], val}, depth+1, !isMax);
                 if(isMax) {
                     if(score > max_score) {
                         max_score = score;
@@ -126,11 +147,13 @@ class MiniMaxPlayer : public Player {
             		}
             	}
         	}
+        	
+        	// End of loop - return best [action,score] pair
             if (isMax) {
-        		return max_score - depth;
+        		return make_pair(action, max_score - depth);
     		}
 			else {
-        		return min_score + depth;
+        		return make_pair(action, min_score + depth);
     		}
 		}
 };
