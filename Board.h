@@ -113,6 +113,7 @@ public:
     void push(int lin_ind, int val) {
     	assert ((val == 1) || (val == -1));
     	assert (board[lin_ind]==0);
+    	assert((lin_ind>-1 and lin_ind<sizeSq));
     	board[lin_ind] = val;
     	boardAs2D[M(lin_ind)][N(lin_ind)] = val;
 	}
