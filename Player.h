@@ -59,7 +59,7 @@ class RandomComputer : public Player {
         }
         int GetAction(Board board) {
         	vector<int> valid_actions = board.GetValidActions();
-            int index = rand() % valid_actions.size();
+            int index = rand() % valid_actions.size(); // a random number in the range[0,number of valid actions -1]
             return valid_actions[index];
         }
 };
