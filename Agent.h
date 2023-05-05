@@ -10,6 +10,7 @@
 #include <tuple> // for tie 
 
 #include "Board.h"
+#include "Player.h"
 using namespace std;
 
 class Agent : public Player {
@@ -29,7 +30,7 @@ public:
 
     float GetQVal(string key) {
         if (Q.find(key) != Q.end()) {
-            return Q[key];
+            return Q.at(key);
         }
         else {
             //std::cout << "found new state: " << key << std::endl;
@@ -41,8 +42,9 @@ public:
     int GetAction(Board board, float exploration_probability = 0) {
         vector<int> valid_actions = board.GetValidActions();
         string state_key = board.EncodeState();
-
+		            
         if ((float)rand() / RAND_MAX < exploration_probability) { //sampling number between 0 to 1
+        
             int action = valid_actions[rand() % valid_actions.size()]; //sampling action 
             string key = EncodeStateActionPair(state_key, action);
             float qVal = GetQVal(key); // needed only for the purpose of expanding the dict (inside GetQVal)
@@ -60,7 +62,7 @@ public:
                     action = act;
                 }
             }
-
+			                    
             // The final key (created with the chosen action):
             // string key = EncodeStateActionPair(state_key, action);
             return action;
@@ -87,17 +89,10 @@ public:
 
     float GetReward(Board board, int lin_ind, int val) {
         if (board.IsWon(lin_ind, val)) {
-            return 1; //Note that we can only win after *our* step.
-            // In other repositories we will find something like this:
-            // if (this->symbol == val) {
-            //     return 1;
-            // }
-            // if (this->symbol == -val) {
-            //     return -1;
-            // }
+            return 1; //Our action (which is lin_ind) had made us won
         }
         else if (checkWinPossible(board)) {
-            return -1;
+            return -1; // we have missed a change to block the opponent winning
         }
         else {
             return 0;
@@ -136,24 +131,28 @@ public:
 	}
 
    void saveTrainer(const string& save_path) {
-	    ofstream outfile(save_path, ios::binary);
-	    if (outfile.is_open()) {
-	        outfile.write(reinterpret_cast<const char*>(&Q), sizeof(Q));
-	        outfile.close();
-	    } else {
-	        // handle error
-	    }
+		ofstream outfile(save_path,ios::trunc);
+		if (outfile.is_open()) {
+        	for (auto const& pair : Q) {
+            	outfile << pair.first << " " << pair.second << std::endl;
+        	}	
+        	outfile.close();
+    	}	
 	}
 	
 	void loadTrainer(const std::string& save_path) {
-	    ifstream infile(save_path, ios::binary);
-	    if (infile.is_open()) {
-	        infile.read(reinterpret_cast<char*>(&Q), sizeof(Q));
-	        infile.close();
-	        std::cout << "Loaded dict with number of keys = " << Q.size() << std::endl;
-	    } else {
-	        // handle error
-	    }
+		ifstream file(save_path);
+		string line;
+		if (file.is_open()) {
+			while (getline(file,line)) {
+				string key = line.substr(0, line.find(' '));
+				float score = stof(line.substr(line.find(' ')+1,line.length()));
+				//cout<<key<<" "<<score<<endl;  
+			}
+			file.close();
+		}
 	}
 };
+unordered_map<string, float> Agent::Q;
+
 #endif

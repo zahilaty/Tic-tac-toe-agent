@@ -1,3 +1,5 @@
+#ifndef Tests_H
+#define Tests_H
 #include <iostream>
 #include "Board.h"
 #include "Player.h"
@@ -43,3 +45,4 @@ int MyTest() {
 	Prints(new_board);
 	return 0;
 }
+#endif
