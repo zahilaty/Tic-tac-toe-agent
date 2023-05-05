@@ -1,5 +1,8 @@
 # Tic-Tac-Toe Reinforcement Learning Agent
 
+Update (5/5/2023) : A new C++ implementation has been added that has improved the speed of both RL agent training  
+and the minimax algorithm
+
 This project implements a tic-tac-toe agent, trained using Q-learning (RL). The agent learns to play tic-tac-toe by playing against another copy of itself.
 **Unlike other implementations,** this repository is able to represent both players using a single Q-value dictionary.
 This is possible because the state-action pairs for X and O are disjunct, meaning that they don't overlap.
