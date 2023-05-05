@@ -6,7 +6,7 @@ Some hard coded things:
     0 is blank space at the board
     
 TODO:
-    1) Test for boards which are not 3X3                                                                   we can inverse?)
+    1) Test for boards which are not 3x3
 
 @author: zahil
 """

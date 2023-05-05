@@ -33,7 +33,7 @@ public:
             return Q.at(key);
         }
         else {
-            //std::cout << "found new state: " << key << std::endl;
+            //cout << "found new state: " << key << endl;
             Q[key] = 0;
             return 0;
         }
@@ -57,6 +57,7 @@ public:
             for (int act : valid_actions) {
                 string key = EncodeStateActionPair(state_key, act);
                 float qVal = GetQVal(key);
+                //cout<<key<<" "<<qVal<<endl; //for debug
                 if (qVal > bestQVal) {
                     bestQVal = qVal;
                     action = act;
@@ -137,6 +138,7 @@ public:
             	outfile << pair.first << " " << pair.second << std::endl;
         	}	
         	outfile.close();
+        	cout<<"Saved Q dict with :"<<Q.size()<< " keys"<<endl;
     	}	
 	}
 	
@@ -147,10 +149,13 @@ public:
 			while (getline(file,line)) {
 				string key = line.substr(0, line.find(' '));
 				float score = stof(line.substr(line.find(' ')+1,line.length()));
-				//cout<<key<<" "<<score<<endl;  
+				//cout<<key<<" "<<score<<endl;  //for debug
+				Q[key] = score;
 			}
 			file.close();
+			cout<<"Loaded Q dict with :"<<Q.size()<< " keys"<<endl;
 		}
+		
 	}
 };
 unordered_map<string, float> Agent::Q;

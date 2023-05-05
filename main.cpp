@@ -30,13 +30,14 @@ if (false) {
 if (true) {
 	Board board;
     //MiniMaxPlayer p1(1);
-    //HumanPlayer p1(1);
-    Agent p1(1);
-    p1.loadTrainer("SharedDictFromCpp.bin");
+    HumanPlayer p1(1);
+    //Agent p1(1);
+    //p1.loadTrainer("SharedDictFromCpp.txt");
     
-	HumanPlayer p2(-1);
+	//HumanPlayer p2(-1);
     //MiniMaxPlayer p2(-1);
-    //p2.loadTrainer("SharedDict.pkl");
+    Agent p2(-1);
+	p2.loadTrainer("SharedDictFromCpp.txt");
     if (p1.typ == 0) {
         board.PrintBoard();
     }

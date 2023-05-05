@@ -9,8 +9,8 @@ int TrainAgent() {
   Agent p1(1); // 1 = x
   Agent p2(-1); // -1 = o
   p1.loadTrainer("SharedDictFromCpp.txt");
-
-  int NumOfIter = 150000;
+  
+  int NumOfIter = 200000;
   double p1_decay_factor = 0.9999;
   double p2_decay_factor = 0.9999;
   double p1_exp_prob = 1;
