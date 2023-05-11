@@ -8,8 +8,8 @@
 #include <numeric> //for sum of array in one line..
 #include <time.h> //for srand seed
 using namespace std;
-const int size = 3; // I used define istead of this: https://stackoverflow.com/questions/751878/determine-array-size-in-constructor-initializer
-const int sizeSq = size*size;
+const int br_size = 3; // I used define instead of this: https://stackoverflow.com/questions/751878/determine-array-size-in-constructor-initializer
+const int sizeSq = br_size*br_size;
 
 class Board {
 public:
@@ -37,11 +37,11 @@ public:
 	
 	// From linear index of 1D board to 2D  	
 	int M(int lin_ind) {
-  		int m = (int) lin_ind/size;
+  		int m = (int) lin_ind/br_size;
   		return m;
 	}
 	int N(int lin_ind) {
-		int n = lin_ind%size;
+		int n = lin_ind%br_size;
 		return n;
 	}
 	
@@ -71,9 +71,9 @@ public:
     // Print the board
     void PrintBoard() {
     cout << '\n';
-	    for (int m = 0; m < size; m++) {
+	    for (int m = 0; m < br_size; m++) {
 	        string str = "  ";
-	        for (int n = 0; n < size; n++) {
+	        for (int n = 0; n < br_size; n++) {
 	            if (boardAs2D[m][n] == 0) {
 	                str += '_';
 	            }
@@ -83,14 +83,14 @@ public:
 	            if (boardAs2D[m][n] == -1) {
 	                str += 'o';
 	            }
-	            if (n < size-1) {
+	            if (n < br_size-1) {
 	                str += "  :  ";
 	            } else {
 	                str += "";
 	            }
 	        }
 	        cout << str << '\n';
-	        if (m < size-1) {
+	        if (m < br_size-1) {
 	            cout << "-----------------\n";
 	        }
 	    }
@@ -143,11 +143,11 @@ public:
 	bool IsWon(int lin_ind,int val) {
 		int m = M(lin_ind);
 		int n = N(lin_ind);    	
-		int SumTOWin = val*size; //either +3 or -3
+		int SumTOWin = val*br_size; //either +3 or -3
 		
 		// Sum of elements in row m (go over col)
     	int row_sum = 0;
-		for (int col=0;col<size;col++) {
+		for (int col=0;col<br_size;col++) {
 			row_sum += boardAs2D[m][col];
 		}
 		if (row_sum==SumTOWin) {
@@ -156,7 +156,7 @@ public:
 		
 		// Sum of elements in col n (go over row)
     	int col_sum = 0;
-		for (int row=0;row<size;row++) {
+		for (int row=0;row<br_size;row++) {
 			col_sum += boardAs2D[row][n];
 		}
 		if (col_sum==SumTOWin) {
@@ -167,7 +167,7 @@ public:
 		if (m==n) {
 			// Sum of elements in diag
 			int diag_sum = 0;
-			for (int k=0;k<size;k++) {
+			for (int k=0;k<br_size;k++) {
 				diag_sum += boardAs2D[k][k];
 			}
 			if (diag_sum==SumTOWin) {
@@ -176,11 +176,11 @@ public:
 		}
 		
 		// The only case we need to check the reverse-diagonal . Example: m=0,n=2,m+n = 2, size = 3
-		if (m+n == (size-1)) {
+		if (m+n == (br_size-1)) {
 			// sum of elements in reverse diagonal
 			int rev_diag_sum = 0;
-			for (int k=0;k<size;k++) {
-				rev_diag_sum += boardAs2D[k][size-1-k];
+			for (int k=0;k<br_size;k++) {
+				rev_diag_sum += boardAs2D[k][br_size-1-k];
 			}
 			if (rev_diag_sum==SumTOWin) {
 				return true;
@@ -193,7 +193,7 @@ public:
 	
 	// Encode State for Q learning dictionary
 	string EncodeState() {
-		char CodeAsChars[size*size];
+		char CodeAsChars[br_size*br_size];
 		for (int ind = 0; ind<sizeSq;ind++) {
     		if (board[ind]==0) {
     			CodeAsChars[ind] = '_';
@@ -216,8 +216,8 @@ public:
 	bool draw = false;
 	
 private:
-	int board[size*size];
-	int boardAs2D[size][size]; 
+	int board[br_size*br_size];
+	int boardAs2D[br_size][br_size]; 
 
 };
 
